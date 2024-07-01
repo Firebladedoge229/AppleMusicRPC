@@ -38,13 +38,13 @@ def update_rpc(track_info):
         songEncode = urllib.parse.quote(track_info["song"])
         artistEncode = urllib.parse.quote(track_info["artist"])
         albumEncode = urllib.parse.quote(track_info["album"])
-        artworkURL = f"https://music.apple.com/us/search?term={songEncode}%20{artistEncode}%20{albumEncode}"
+        artworkURL = f"https://music.apple.com/us/search?term={artistEncode}%20{albumEncode}"
         response = requests.get(artworkURL)
-        url_pattern = r'"url"\s*:\s*"([^"]*Music1[^"]*)"'
-        match = re.search(url_pattern, response.text)
+        url_pattern = re.compile(r'aria-label="{}.*?<source sizes="110px" srcset="(https://[^"]*?)\s110w'.format(re.escape(re.sub(r'[^\w\s]', '', track_info["album"]))), re.DOTALL)
+        match = url_pattern.search(response.text)
         if match:
             url = match.group(1)
-            url = url.replace("{w}", "2400").replace("{h}", "2400").replace("{f}", "png")
+            url = url.replace("110", "2400").replace("webp", "png")
 
             rpc.update(
                 state=track_info["song"],
@@ -52,7 +52,7 @@ def update_rpc(track_info):
                 large_image=url,
                 large_text=track_info["album"],
                 start=int(time.time() - track_info["position"]),
-                end=int(time.time() + (track_info["duration"] - track_info["position"]))
+                end=int(time.time() + (track_info["duration"] - track_info["position"])),
             )
 
 def main():

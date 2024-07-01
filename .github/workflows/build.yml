@@ -1,0 +1,55 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10.11'
+
+    - name: Install dependencies
+      run: |
+        pip install pywin32==306
+        pip install colorama==0.4.6
+        pip install requests==2.31.0
+        pip install pypresence==4.3.0
+        pip install pyinstaller==6.4.0
+    - name: Build executable
+      run: pyinstaller --onefile --noconsole --icon=icon.ico --add-data="icon.ico;." AppleMusic.py
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "v1.${{ github.run_number }}"
+        release_name: Release v1.${{ github.run_number }}
+        body: |
+          An automated release.
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/robloxstudiomanager.exe
+        asset_name: RobloxStudioManager.exe
+        asset_content_type: application/octet-stream

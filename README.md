@@ -13,6 +13,9 @@ A [Windows Defender SmartScreen](https://learn.microsoft.com/en-us/windows/secur
 
 If you are suspicious, feel free to compile the code yourself!
 
+### Commands
+--id: Sets the Discord Rich Presence Id
+
 ### Build Command
 ```py
 pyinstaller --onefile --noconsole --icon=icon.ico --add-data="icon.ico;." AppleMusic.py

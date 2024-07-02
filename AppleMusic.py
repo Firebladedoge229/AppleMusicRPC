@@ -81,7 +81,7 @@ def main():
                         update_rpc(track_info)
                 elif previousTrack is None:
                     update_rpc(track_info)
-            else:
+            elif not track_info:
                 rpc.clear()
                 previousTrack = None
                 time.sleep(1)

@@ -45,14 +45,15 @@ def update_rpc(track_info):
         response = requests.get(artworkURL)
         url_pattern = re.compile(r'aria-label="{}.*?<source sizes="110px" srcset="(https://[^"]*?)\s110w'.format(re.escape(track_info["song"])), re.DOTALL)
         match = url_pattern.search(response.text)
+        global url
         if match:
             url = match.group(1)
             url = url.replace("110", "2400").replace("webp", "png")
         rpc.update(
-                state=track_info["song"],
-                details=track_info["artist"],
+                state=track_info["song"] or "Unknown",
+                details=track_info["artist"] or "Unknown",
                 large_image=url or "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/2048px-Apple_Music_icon.svg.png",
-                large_text=track_info["album"],
+                large_text=track_info["album"] or "Unknown",
                 start=int(time.time() - track_info["position"]),
                 end=int(time.time() + (track_info["duration"] - track_info["position"]))
             )
@@ -98,4 +99,4 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exception:
-        print(f"{Style.BRIGHT}{Fore.RED}Error: {Style.RESET_ALL}{exception}")
+        print(f"{Style.BRIGHT}{Fore.RED}Error: {Style.RESET_ALL}{exception}") 

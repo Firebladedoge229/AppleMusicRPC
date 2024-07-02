@@ -14,6 +14,9 @@ rpcClient = None
 mint = "\033[38;2;52;235;143m"
 previousTrack = None
 
+def fix_title(text):
+    return re.sub(r"[^\w\s]", "", text)
+
 def get_current_track_info():
     try:
         iTunes = win32com.client.Dispatch("iTunes.Application")
@@ -37,22 +40,21 @@ def update_rpc(track_info):
         print(f"{mint}Currently Playing: {Style.RESET_ALL}{track_info['song']} {mint}by {Style.RESET_ALL}{track_info['artist']}")
         songEncode = urllib.parse.quote(track_info["song"])
         artistEncode = urllib.parse.quote(track_info["artist"])
-        albumEncode = urllib.parse.quote(track_info["album"])
-        artworkURL = f"https://music.apple.com/us/search?term={artistEncode}%20{albumEncode}"
+        albumEncode = urllib.parse.quote(fix_title(track_info["album"]))
+        artworkURL = f"https://music.apple.com/us/search?term={songEncode}%20{artistEncode}%20{albumEncode}"
         response = requests.get(artworkURL)
-        url_pattern = re.compile(r'aria-label="{}.*?<source sizes="110px" srcset="(https://[^"]*?)\s110w'.format(re.escape(re.sub(r'[^\w\s]', '', track_info["album"]))), re.DOTALL)
+        url_pattern = re.compile(r'aria-label="{}.*?<source sizes="110px" srcset="(https://[^"]*?)\s110w'.format(re.escape(track_info["song"])), re.DOTALL)
         match = url_pattern.search(response.text)
         if match:
             url = match.group(1)
             url = url.replace("110", "2400").replace("webp", "png")
-
-            rpc.update(
+        rpc.update(
                 state=track_info["song"],
                 details=track_info["artist"],
-                large_image=url,
+                large_image=url or "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/2048px-Apple_Music_icon.svg.png",
                 large_text=track_info["album"],
                 start=int(time.time() - track_info["position"]),
-                end=int(time.time() + (track_info["duration"] - track_info["position"])),
+                end=int(time.time() + (track_info["duration"] - track_info["position"]))
             )
 
 def main():

@@ -1,6 +1,10 @@
 ![Apple Music Rich Presence](https://github.com/Firebladedoge229/AppleMusicRPC/blob/main/logo.png?raw=true)
 
 # Apple Music Rich Presence
+
+> [!NOTE]
+> This program is meant for iTunes, and does not work with Apple Music for Windows.
+
 An actual Apple Music Rich Presence for Discord.
 
 ![Showcase](https://i.ibb.co/6YCPBSL/demo.png)
